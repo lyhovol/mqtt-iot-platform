@@ -11,3 +11,5 @@ __pycache__/
 
 # 环境变量文件（以后存密码用，绝对不能提交）
 .env
+
+docs/manual.md
