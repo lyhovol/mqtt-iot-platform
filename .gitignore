@@ -1,0 +1,13 @@
+# 虚拟环境
+.venv/
+
+# python 运行时缓存
+__pycache__/
+*.pyc
+
+# 工具目录
+.workbuddy/
+.claude/
+
+# 环境变量文件（以后存密码用，绝对不能提交）
+.env
