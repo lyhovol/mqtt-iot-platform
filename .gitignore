@@ -13,3 +13,10 @@ __pycache__/
 .env
 
 docs/manual.md
+
+# 会话摘要（小鲸鱼看的过程性快照，不是项目文档）
+docs/session-handoff-*.md
+
+# 脚本生成的数据文件（源码进 git，生成物不进）
+devices.json
+notes.txt
