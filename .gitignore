@@ -18,5 +18,5 @@ docs/manual.md
 docs/session-handoff-*.md
 
 # 脚本生成的数据文件（源码进 git，生成物不进）
-devices.json
-notes.txt
+devices*.json
+notes*.txt

@@ -322,4 +322,44 @@
 > 读出方向是一对镜像：`json.load(f)` 从文件读，`json.loads(s)` 从字符串读。
 > 项目里最常出现的是 `json.loads(resp.text)` —— `requests` 拿到的响应就是**字符串**，用 `loads` 解析。
 
+---
+
+## 2026-10-03 · Day 6
+
+### 今天做了什么
+
+- 面向对象入门：`class`、`__init__`、`self`、方法
+- 写了 `day6_class.py`：`Device` 类，含 `describe()` / `level()` / `to_dict()` 三个方法
+- 给 `day6_class.py` 加了 `if __name__ == "__main__":` 保护——import 它时，末尾的自测代码跟着一起执行了
+- 写了 `day6_class_json.py`：`from day6_class import Device` → 对象转字典 → `json.dump` 写文件 → `json.load` 读回
+- 识了两个坑：遍历时不能修改被遍历的列表；JSON 只能存数据、存不了行为（读回来是 dict，没有 level()）
+
+### 卡在哪 / 没搞懂什么
+
+- 边遍历 rows 边 rows.append(...)，第 4 轮才取到自己塞进去的字典，报错位置看着莫名其妙
+
+> 批注（小鲸鱼）：今天实际卡了三次，另外两次没记进来——
+> - import `day6_class` 时，被它末尾那 4 行没有 `__main__` 保护的 print 咬了一口（Day 5 学的知识点，第二天就还回来了）
+> - `elif 0 <= self.temperature < 30:` 里的 `0 <=` 是多余的——Day 3 讲过 `>= 0` 没必要，换个写法又出现了
+
+### 明天第一件事
+
+- Day 7：给 `Device` 加 `from_dict()`，把读回来的字典变回对象，跑通「对象 → 存文件 → 读回 → 变回对象」的完整闭环
+
+### 面试题
+
+**第 1 题**：`__init__` 是干什么的？它什么时候被调用？如果 `Device` 类里不写 `__init__`，创建对象时会怎样？
+
+我的回答：
+
+
+**第 2 题**：方法里的 `self` 是什么？为什么写 `self.name` 能拿到属性，直接写 `name` 就报 `NameError`？
+
+我的回答：
+
+
+**第 3 题**：为什么 `json.dumps(device)` 会报 `TypeError: Object of type Device is not JSON serializable`？加一个 `to_dict()` 方法解决了什么问题？
+
+我的回答：
+
 
