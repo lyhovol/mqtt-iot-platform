@@ -18,5 +18,7 @@ docs/manual.md
 docs/session-handoff-*.md
 
 # 脚本生成的数据文件（源码进 git，生成物不进）
+# 生成物多起来之后改成：统一放进各自目录的 out/ 子目录，然后只忽略 out/
 devices*.json
+store*.json
 notes*.txt

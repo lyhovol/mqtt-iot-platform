@@ -350,16 +350,87 @@
 
 **第 1 题**：`__init__` 是干什么的？它什么时候被调用？如果 `Device` 类里不写 `__init__`，创建对象时会怎样？
 
-我的回答：
+我的回答：是构造方法，
+
+> 批注（小鲸鱼）：**对，但只答了一个词。**这题有三问，补全：
+> ① **更准确的定义**：它不是"创建对象"，而是"对象**造出来之后**，负责给它装上初始属性"。创建对象这一步是 Python 做的，`__init__` 只是被叫来初始化。
+> ② **什么时候被调用**：`Device("设备A", -5)` 这一行——你从没写过 `d.__init__(...)`，是 Python **自动**调的。
+> ③ **不写会怎样**：对象照样能造出来（`d = Device()` 不会报错），但它**一个属性都没有**，接着写 `d.name` 就报 `AttributeError: 'Device' object has no attribute 'name'`。`__init__` 就是给对象"上电焊装零件"的那一步。
 
 
 **第 2 题**：方法里的 `self` 是什么？为什么写 `self.name` 能拿到属性，直接写 `name` 就报 `NameError`？
 
-我的回答：
+我的回答：self指自己，selfname才有值
+
+> 批注（小鲸鱼）：**第一句对，第二句写糊了**（我猜 `selfname` 是 `self.name` 敲漏了那个点——而那个点就是"属性访问"，漏了就变成另一个普通变量名）。
+> 把"为什么必须写"讲清：
+> - `self` = **这个方法被调用的那个对象**。`d1.describe()` 里的 `self` 就是 `d1`，`d2.describe()` 里就是 `d2`。
+> - 为什么直接写 `name` 不行：方法里找名字有固定顺序——先找**函数内部的局部变量**，再找全局变量，**永远不会自动去对象身上找**。所以 `name` 找不到 → `NameError`。
+> - 写 `self.name` 才是明确告诉 Python："去**这个对象**身上取 name。"
+> 一句话：**`self` 是从对象里取东西的唯一入口。**
 
 
 **第 3 题**：为什么 `json.dumps(device)` 会报 `TypeError: Object of type Device is not JSON serializable`？加一个 `to_dict()` 方法解决了什么问题？
 
-我的回答：
+我的回答：要变成字典才能被json读取
+
+> 批注（小鲸鱼）：**核心答对了。**补一层"为什么"，面试时能多说一句：
+> - `json` 内部只认**七种类型**：`dict` / `list` / `str` / `int` / `float` / `bool` / `None`。碰到别的类型，它只有一招——抛 `TypeError`。
+> - `Device` 是你自己造的类型，不在那七种里。所以 `json.dumps(device)` 报错**不是"存不了"，是"它不认识"**。
+> - `to_dict()` 干的事就是**把你的类型翻译成它认识的语言**（自定义对象 → `dict`）。
+> - 术语：这个"对象 → 可存储格式"的动作叫**序列化**；反过来（`from_dict`）叫**反序列化**。
+
+---
+
+## 2026-10-04 · Day 7
+
+### 今天做了什么
+
+- 把 Device 从练习脚本搬进 app/device.py，成为项目第一个真实模块
+- 学了跨目录 import：直接跑脚本会报 ModuleNotFoundError，要用 python -m scripts.day7.xxx
+- 给 Device 加了 from_dict() 类方法（@classmethod），跑通「对象 → 存文件 → 读回 → 变回对象」的完整闭环
+- 写了 DeviceStore（设备仓库类）：__init__ / add / load / save / find / online_count
+- 学会「先定接口、实现照做」——store 的方法名和调用方对不上，是这次报错的真正原因
+- 自己写出了列表推导式 [Device.from_dict(d) for d in data]
+
+### 卡在哪 / 没搞懂什么
+
+- 跨目录 import 报错，不知道和运行方式有关
+- 在脚本里又写了一遍 class Device，把 import 进来的那个覆盖了
+
+> 批注（小鲸鱼）：今天还卡了两次没记进来——
+> - `app/device.py` 建好了但**是 0 字节**（贴了没保存），而 `ImportError` 报的完全看不出"文件是空的"（那句 `Did you mean: 'device'?` 是误导，别顺着它查）
+> - `app/store.py` 的方法名（`add_device`/`save_to_file`/`find_device_by_name`）和调用方的脚本对不上，`TypeError` 报在调用方，问题却在实现方
+
+### 明天第一件事
+
+- 写一个模拟上报器——用 random + datetime 造假的设备数据，按时间逐个写进 DeviceStore，并让温度超标的设备自己报出告警
+
+### 面试题
+
+**第 1 题**：`python scripts\day7\xxx.py` 和 `python -m scripts.day7.xxx` 有什么区别？为什么前一种写法会报 `ModuleNotFoundError: No module named 'app'`？
+
+我的回答：前一种只读取了自己文件夹，找不到一样的名字
+
+> 批注（小鲸鱼）：**核心是对的**（直接跑 = 只看脚本自己那个目录）。把术语补准，面试时说得更硬：
+> - 直接跑脚本时，Python 把 **`sys.path[0]` 设成「脚本所在的目录」**（`scripts\day7`），跟你人在哪个目录**无关**；
+> - `python -m` 才把 **「当前目录」（项目根）**放进搜索路径，所以 `app` 找得到。
+> - 所以这不是"找不到一样的名字"，是"**搜索路径里没有 `app` 这个位置**"。
+
+
+**第 2 题**：`@classmethod` 是干什么的？为什么 `from_dict` **必须**用它、不能写成普通方法 `def from_dict(self, data)`？
+
+我的回答：类方法，普通方法要有实例，类方法把对象转成实例
+
+> 批注（小鲸鱼）：**前半句对，后半句说反了**——`from_dict` 是**把字典转成实例**，不是"把对象转成实例"。
+> 准确的说法（面试照这个说）：
+> - `@classmethod` 让方法的第一个参数收到的是**类本身**（`cls` 就是 `Device`），而不是实例；
+> - 所以可以直接 `Device.from_dict(d)`，**不需要先有对象**——而 `from_dict` 要干的事正是"造一个新对象"，这就是它非用类方法不可的原因；
+> - 一句话对照：**普通方法是「对某个对象做事」，类方法是「由类自己做事」**。
+
+
+**第 3 题**：`load()` 里如果写成 `self.devices.append(Device.from_dict(d))` 而不是 `self.devices = [...]`，连续调用两次 `load()` 会发生什么？
+
+我的回答：会接着上一次的数据继续读取，越读越多
 
 
