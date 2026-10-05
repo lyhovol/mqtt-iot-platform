@@ -1,8 +1,9 @@
 class Device:
-    def __init__(self, name, temperature, online=True):  # 构造
+    def __init__(self, name, temperature, online=True, timestamp=None):  # 构造
         self.name = name  # self指自己
         self.temperature = temperature
         self.online = online
+        self.timestamp = timestamp
 
     def describe(self):
         return f"设备 {self.name} 温度为 {self.temperature}°C {'在线' if self.online else '离线'}"
@@ -20,8 +21,11 @@ class Device:
             "name": self.name,
             "temperature": self.temperature,
             "online": self.online,
+            "timestamp": self.timestamp,
         }
 
     @classmethod
     def from_dict(cls, data):
-        return cls(data["name"], data["temperature"], data["online"])
+        return cls(
+            data["name"], data["temperature"], data["online"], data.get("timestamp")
+        )
