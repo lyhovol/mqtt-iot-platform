@@ -1,12 +1,14 @@
 import random
 from datetime import datetime
 from app.device import Device
+from app.alert import Alert
 import time
 
 
 class Simulator:
-    def __init__(self, store, device_names):
+    def __init__(self, store, alert_store, device_names):
         self.store = store
+        self.alert_store = alert_store
         self.device_names = device_names
 
     def register(self):
@@ -23,6 +25,14 @@ class Simulator:
         print(f"[{ts}] {device.name} {device.temperature}°C {device.level()}")
         if device.level() != "温度正常":
             print(f"[告警] {device.name} {device.level()}：{device.temperature}°C")
+            self.alert_store.add(
+                Alert(
+                    device_name=device.name,
+                    level=device.level(),
+                    temperature=device.temperature,
+                    timestamp=ts,
+                )
+            )
 
     def run(self, rounds, interval=1, flush_every=3):
         try:
@@ -33,3 +43,4 @@ class Simulator:
                     self.store.save()
         finally:
             self.store.save()
+            self.alert_store.save()

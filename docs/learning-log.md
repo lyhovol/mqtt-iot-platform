@@ -487,4 +487,69 @@
 
 我的回答：是兜底的，第9次存不进
 
+---
+
+## 2026-10-06 · Day 9
+
+### 今天做了什么
+
+- 写了 app/alert.py（class Alert）：describe / to_dict / from_dict 四件套
+- 写了 app/alert_store.py（class AlertStore）：add / load / save / count / count_by_device
+- 改了 simulator.py：__init__ 多收 alert_store，超标时生成 Alert 存进去，finally 里一起落盘
+- 学会 .get(k, 默认值) 的两种真实用法：向后兼容（timestamp）+ 计数（result.get(k, 0) + 1）
+- 学会用切片取最近 N 条（self.alerts[-3:]）
+- 改了 scripts/day8/day8_simulate.py（Simulator 签名变了，调用方必须跟着改）
+
+### 卡在哪 / 没搞懂什么
+
+- 类名写成 Alertstore（少一个大写），报 ImportError
+
+> 批注（小鲸鱼）：今天还卡了一个更值钱的，没记进来——
+> - **字段错位**：`Alert.__init__` 的参数顺序和调用方不一致，`level` / `temperature` 两个值互换；而 `describe()` 又把它换回来，所以**输出看着完全正常**，只有打开 json 才看得出（`"temperature": "高温警告"`）
+> - 还有一次是把指令里的省略号 `...` 原样抄进了 `print`（这条算我的表述问题）
+
+### 明天第一件事
+
+- Day 10：学继承——把 Alert 和 Device 里重复的 describe / to_dict / from_dict 抽到一个父类 BaseModel，用 super() 让子类复用
+
+### 面试题
+
+**第 1 题**：`Alert` 的 `describe` / `to_dict` / `from_dict` 和 `Device` 几乎一模一样。这种重复你打算怎么处理？
+
+我的回答：可以都放到一个父类中
+
+> 批注（小鲸鱼）：**完全正确**，而且这就是明天的内容——把重复的 `describe` / `to_dict` / `from_dict` 抽到一个父类 `BaseModel`，`Alert` 和 `Device` 都继承它。你自己先把答案说出来了，明天只是把手法学会。
+
+
+**第 2 题**：`data["x"]` 和 `data.get("x", 0)` 分别在什么时候用？各举一个你今天写过的真实例子。
+
+我的回答：从字典读回用，get用在时间上
+
+> 批注（小鲸鱼）：**意思到了，但两个例子只说了一个，而且没说到"该用哪个"的判断标准。**补全：
+>
+> | 写法 | 什么时候用 | 你今天写过的例子 |
+> |---|---|---|
+> | `data["x"]` | **必填字段**——缺了说明数据坏了，**就该当场报错** | `data["device_name"]`、`data["level"]`（`Alert.from_dict` 里） |
+> | `data.get("x")` | **可选/后加的字段**——旧数据里可能没有 | `data.get("timestamp")`（`Device.from_dict` 里） |
+> | `data.get("x", 默认值)` | **要拿它参与运算**，缺了得有起点 | `result.get(alert.device_name, 0) + 1`（`count_by_device` 里） |
+>
+> 你说的"get 用在时间上"就是第二行 ✅。"从字典读回用"含糊——**不是"读回"，是"读必填字段"**。
+> 一句话：**必填用 `[]`（错误要暴露），可选和计数用 `.get()`（缺了要给兜底）。**
+
+
+**第 3 题**：Python 里类名、函数名、变量名分别用什么命名风格？为什么 `AlertStore` 里的方法不该写成 `add_alert()`？
+
+我的回答：驼峰命名法，太啰嗦了
+
+> 批注（小鲸鱼）：**"太啰嗦"答对了。但"驼峰命名法"太笼统——Python 有两种风格，得分清：**
+>
+> | 对象 | 风格 | 例子 |
+> |---|---|---|
+> | 类 | **大驼峰**（PascalCase） | `AlertStore`、`Device`、`Simulator` |
+> | 函数 / 方法 / 变量 | **下划线**（snake_case） | `count_by_device`、`alert_store`、`device_name` |
+> | 常量 | 全大写 | `MAX_TEMPERATURE` |
+>
+> 面试时说"Python 里类用大驼峰、函数和变量用下划线"，才算答全。说"驼峰命名法"会被追问"哪种驼峰"。
+> 至于方法名——`AlertStore.add_alert()` 是**信息重复**（类已经说了是 Alert），写成 `add()` 就够。
+
 
