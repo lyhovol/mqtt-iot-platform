@@ -7,5 +7,5 @@ print("总告警条数:", store.count())
 print("按设备统计:", store.count_by_device())
 
 print("最近 3 条:")
-for alert in store.alerts[-3:]:
+for alert in store.items[-3:]:
     print(" ", alert.describe())

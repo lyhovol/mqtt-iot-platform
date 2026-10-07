@@ -17,7 +17,7 @@ class Simulator:
         self.store.save()
 
     def report_once(self):
-        device = random.choice(self.store.devices)
+        device = random.choice(self.store.items)
         ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         device.temperature = round(random.uniform(15, 45), 1)
         device.timestamp = ts

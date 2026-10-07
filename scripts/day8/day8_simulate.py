@@ -10,4 +10,4 @@ sim.run(9)
 
 check = DeviceStore("scripts/day8/simulated.json")
 check.load()
-print(len(check.devices))
+print(len(check.items))

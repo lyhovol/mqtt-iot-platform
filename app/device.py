@@ -1,4 +1,7 @@
-class Device:
+from app.base import BaseModel
+
+
+class Device(BaseModel):
     def __init__(self, name, temperature, online=True, timestamp=None):  # 构造
         self.name = name  # self指自己
         self.temperature = temperature
@@ -15,17 +18,3 @@ class Device:
             return "温度正常"
         else:
             return "高温警告"
-
-    def to_dict(self):
-        return {
-            "name": self.name,
-            "temperature": self.temperature,
-            "online": self.online,
-            "timestamp": self.timestamp,
-        }
-
-    @classmethod
-    def from_dict(cls, data):
-        return cls(
-            data["name"], data["temperature"], data["online"], data.get("timestamp")
-        )

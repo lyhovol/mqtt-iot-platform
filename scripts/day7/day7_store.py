@@ -9,7 +9,7 @@ store.save()
 
 store2 = DeviceStore("scripts/day7/store.json")
 store2.load()
-print(len(store2.devices))
+print(len(store2.items))
 print(store2.online_count())
 print(store2.find("sensor-002").describe())
 print(store2.find("不存在"))

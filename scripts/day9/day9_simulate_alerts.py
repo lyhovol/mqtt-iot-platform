@@ -11,5 +11,5 @@ sim.run(9)
 check = AlertStore("scripts/day9/alerts.json")
 check.load()
 print("告警条数:", check.count())
-for a in check.alerts:
+for a in check.items:
     print(a.describe())
